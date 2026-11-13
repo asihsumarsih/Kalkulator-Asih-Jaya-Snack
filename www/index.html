@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kalkulator Asih Jaya Snack</title>
+<style>
+body{font-family:Arial;background:#eaf1ec;margin:0;padding:20px}
+.app{max-width:400px;margin:20px auto;background:white;padding:20px;border-radius:20px}
+h2{text-align:center;color:#17613b}
+#layar{background:#123b2a;color:white;padding:25px 15px;text-align:right;font-size:35px;border-radius:12px;overflow-wrap:anywhere;margin-bottom:15px}
+#rumus{font-size:15px;color:#b9d2c3}
+.keys{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+button{height:62px;border:0;border-radius:12px;background:#edf3ef;font-size:21px;font-weight:bold;color:#183326}
+.op{background:#dcebe1;color:#17613b}
+.clear{background:#fbe8e5;color:#b43d30}
+.equal{background:#17613b;color:white}
+</style>
+</head>
+<body>
+<div class="app">
+<h2>ASIH JAYA SNACK</h2>
+<div id="layar"><div id="rumus"></div><span id="angka">0</span></div>
+<div class="keys">
+<button class="clear" onclick="hapus()">AC</button>
+<button class="clear" onclick="mundur()">⌫</button>
+<button class="op" onclick="tambah('%')">%</button>
+<button class="op" onclick="tambah('÷')">÷</button>
+<button onclick="tambah('7')">7</button>
+<button onclick="tambah('8')">8</button>
+<button onclick="tambah('9')">9</button>
+<button class="op" onclick="tambah('×')">×</button>
+<button onclick="tambah('4')">4</button>
+<button onclick="tambah('5')">5</button>
+<button onclick="tambah('6')">6</button>
+<button class="op" onclick="tambah('−')">−</button>
+<button onclick="tambah('1')">1</button>
+<button onclick="tambah('2')">2</button>
+<button onclick="tambah('3')">3</button>
+<button class="op" onclick="tambah('+')">+</button>
+<button onclick="tambah('00')">00</button>
+<button onclick="tambah('0')">0</button>
+<button onclick="tambah('000')">000</button>
+<button onclick="tambah('.')">.</button>
+<button class="equal" style="grid-column:span 4" onclick="hitung()">HASIL =</button>
+</div>
+</div>
+<script>
+let nilai='0',baru=false;
+const angka=document.getElementById('angka');
+const rumus=document.getElementById('rumus');
+function tampil(){angka.textContent=nilai}
+function tambah(v){
+if(/[0-9]/.test(v)){
+if(baru){nilai='0';baru=false}
+if(nilai==='0')nilai=v.length>1?'0':v;
+else nilai+=v;
+}else if(v==='.'){
+if(baru){nilai='0';baru=false}
+if(!nilai.split(/[+−×÷%]/).pop().includes('.'))nilai+='.';
+}else{
+baru=false;
+if(/[+−×÷%]$/.test(nilai))nilai=nilai.slice(0,-1)+v;
+else nilai+=v;
+}
+tampil()
+}
+function hapus(){nilai='0';baru=false;rumus.textContent='';tampil()}
+function mundur(){nilai=nilai.length>1?nilai.slice(0,-1):'0';baru=false;tampil()}
+function hitung(){
+try{
+let s=nilai.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-').replace(/(\d+(?:\.\d+)?)%/g,'($1/100)');
+if(!/^[0-9+\-*/(). ]+$/.test(s))throw 0;
+let hasil=Function('"use strict";return ('+s+')')();
+if(!Number.isFinite(hasil))throw 0;
+rumus.textContent=nilai+' =';
+nilai=String(Number(hasil.toFixed(10)));
+baru=true;tampil()
+}catch(e){angka.textContent='Error';nilai='0';baru=true}
+}
+</script>
+</body>
+</html>
