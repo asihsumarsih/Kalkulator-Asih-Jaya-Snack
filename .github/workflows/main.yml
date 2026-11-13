@@ -27,9 +27,15 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Generate Android Project & Sync
+      - name: Initialize and Sync Capacitor Android
         run: |
-          npx cap add android --force || true
+          # Hapus folder android lama jika ada agar tidak konflik
+          rm -rf android
+          
+          # Tambahkan platform android baru
+          npx cap add android
+          
+          # Sinkronkan file web ke android
           npx cap sync android
 
       - name: Build Debug APK
