@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Android APK (Cordova)
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '18'
 
       - name: Setup Java JDK 17
         uses: actions/setup-java@v4
@@ -24,28 +24,25 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Install Dependencies
-        run: npm install
+      - name: Install Cordova
+        run: npm install -g cordova
 
-      - name: Initialize and Sync Capacitor Android
+      - name: Create Cordova Project & Add Android
         run: |
-          # Hapus folder android lama jika ada agar tidak konflik
-          rm -rf android
-          
-          # Tambahkan platform android baru
-          npx cap add android
-          
-          # Sinkronkan file web ke android
-          npx cap sync android
+          cordova create myapp com.example.kalkulator Kalkulator
+          cd myapp
+          # Pindahkan file www kalkulator kita ke proyek cordova
+          rm -rf www/*
+          cp -r ../www/* www/
+          cordova platform add android
 
-      - name: Build Debug APK
+      - name: Build Android APK
         run: |
-          cd android
-          chmod +x gradlew
-          ./gradlew assembleDebug
+          cd myapp
+          cordova build android --debug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Kalkulator-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: myapp/platforms/android/app/build/outputs/apk/debug/app-debug.apk
