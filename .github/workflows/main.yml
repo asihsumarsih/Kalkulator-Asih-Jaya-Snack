@@ -1,4 +1,4 @@
-name: Build Android APK (Cordova)
+name: Simple Build APK
 
 on:
   push:
@@ -13,36 +13,30 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Setup Java JDK 17
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Install Cordova
-        run: npm install -g cordova
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
 
-      - name: Create Cordova Project & Add Android
+      - name: Build with WebViewGold / Capacitor script
         run: |
-          cordova create myapp com.example.kalkulator Kalkulator
-          cd myapp
-          # Pindahkan file www kalkulator kita ke proyek cordova
-          rm -rf www/*
-          cp -r ../www/* www/
-          cordova platform add android
+          npm install -g @capacitor/cli @capacitor/core
+          npm install
+          npx cap init Kalkulator com.example.kalkulator --web-dir www --yes
+          npx cap add android
+          npx cap sync android
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
-      - name: Build Android APK
-        run: |
-          cd myapp
-          cordova build android --debug
-
-      - name: Upload APK Artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Kalkulator-APK
-          path: myapp/platforms/android/app/build/outputs/apk/debug/app-debug.apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
